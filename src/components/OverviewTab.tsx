@@ -30,13 +30,14 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onOpenTaskModal, onEdi
     viewMode
   } = useDashboard();
 
-  const completedTasks = tasks.filter(t => t.status === 'feito');
-  const inProgressTasks = tasks.filter(t => t.status === 'em_andamento');
-  const pendingTasks = tasks.filter(t => t.status === 'pendente');
-  const completionRate = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const completedTasks = safeTasks.filter(t => t?.status === 'feito');
+  const inProgressTasks = safeTasks.filter(t => t?.status === 'em_andamento');
+  const pendingTasks = safeTasks.filter(t => t?.status === 'pendente');
+  const completionRate = safeTasks.length > 0 ? Math.round((completedTasks.length / safeTasks.length) * 100) : 0;
 
-  const totalSpentFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(adsOverall.totalSpent);
-  const totalRevenueFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(adsOverall.symplaRevenueEstimated);
+  const totalSpentFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(adsOverall?.totalSpent ?? 0));
+  const totalRevenueFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(adsOverall?.symplaRevenueEstimated ?? 0));
 
   return (
     <div className="space-y-6">
@@ -142,7 +143,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onOpenTaskModal, onEdi
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Meta Ads & Sympla</span>
             <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#FFE600] text-black">
-              ROAS {adsOverall.roas}x
+              ROAS {Number(adsOverall?.roas ?? 0)}x
             </span>
           </div>
 
@@ -160,7 +161,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onOpenTaskModal, onEdi
             </div>
             <div>
               <span className="text-zinc-500 block text-[10px]">Ingressos/Reservas:</span>
-              <span className="font-bold text-[#FFE600]">{adsOverall.totalConversions} vendas</span>
+              <span className="font-bold text-[#FFE600]">{Number(adsOverall?.totalConversions ?? 0)} vendas</span>
             </div>
           </div>
 
@@ -177,25 +178,25 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onOpenTaskModal, onEdi
         >
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Tração Instagram</span>
-            <span className="text-xs font-bold text-emerald-400">+{instagramMetric.reachGrowth}% alcance</span>
+            <span className="text-xs font-bold text-emerald-400">+{Number(instagramMetric?.reachGrowth ?? 0)}% alcance</span>
           </div>
 
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-3xl font-black text-white font-lobby tracking-wide">{clientProfile.followersCount}</span>
+            <span className="text-3xl font-black text-white font-lobby tracking-wide">{clientProfile?.followersCount ?? '0'}</span>
             <span className="text-xs text-zinc-400 font-medium">seguidores</span>
           </div>
           <p className="text-xs text-zinc-400 mb-3">
-            {clientProfile.postsCount} posts publicados • @{clientProfile.handle}
+            {clientProfile?.postsCount ?? 0} posts publicados • @{clientProfile?.handle ?? 'listenlobby'}
           </p>
 
           <div className="grid grid-cols-2 gap-2 text-xs bg-zinc-950 p-2.5 rounded-lg border border-zinc-800">
             <div>
               <span className="text-zinc-500 block text-[10px]">Alcance no DF:</span>
-              <span className="font-bold text-white">{(instagramMetric.accountsReached / 1000).toFixed(1)}k contas</span>
+              <span className="font-bold text-white">{(Number(instagramMetric?.accountsReached ?? 0) / 1000).toFixed(1)}k contas</span>
             </div>
             <div>
               <span className="text-zinc-500 block text-[10px]">Média Stories:</span>
-              <span className="font-bold text-[#FFE600]">{instagramMetric.averageStoryViews.toLocaleString('pt-BR')} views</span>
+              <span className="font-bold text-[#FFE600]">{(Number(instagramMetric?.averageStoryViews ?? 0)).toLocaleString('pt-BR')} views</span>
             </div>
           </div>
 

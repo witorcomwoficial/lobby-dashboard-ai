@@ -32,15 +32,19 @@ export const AdsDashboard: React.FC<AdsDashboardProps> = ({
   const [platformFilter, setPlatformFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filteredCampaigns = campaigns.filter(c => {
-    if (statusFilter !== 'all' && c.status !== statusFilter) return false;
-    if (platformFilter !== 'all' && !c.platform.toLowerCase().includes(platformFilter.toLowerCase())) return false;
+  const safeCampaigns = Array.isArray(campaigns) ? campaigns : [];
+  const filteredCampaigns = safeCampaigns.filter(c => {
+    if (statusFilter !== 'all' && c?.status !== statusFilter) return false;
+    if (platformFilter !== 'all' && !c?.platform?.toLowerCase().includes(platformFilter.toLowerCase())) return false;
     return true;
   });
 
-  const totalSpentFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(adsOverall.totalSpent);
-  const totalRevenueFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(adsOverall.symplaRevenueEstimated);
-  const avgCpa = adsOverall.totalConversions > 0 ? (adsOverall.totalSpent / adsOverall.totalConversions) : 0;
+  const safeTotalSpent = Number(adsOverall?.totalSpent ?? 0);
+  const safeTotalRevenue = Number(adsOverall?.symplaRevenueEstimated ?? 0);
+  const safeTotalConversions = Number(adsOverall?.totalConversions ?? 0);
+  const totalSpentFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(safeTotalSpent);
+  const totalRevenueFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(safeTotalRevenue);
+  const avgCpa = safeTotalConversions > 0 ? (safeTotalSpent / safeTotalConversions) : 0;
   const avgCpaFormatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(avgCpa);
 
   const weeklyData = [
@@ -123,7 +127,7 @@ export const AdsDashboard: React.FC<AdsDashboardProps> = ({
           <div className="flex items-center justify-between text-xs text-zinc-400 mb-2">
             <span className="font-semibold text-zinc-300">Retorno Estimado</span>
             <span className="px-2 py-0.5 rounded bg-[#FFE600] text-black font-extrabold text-[10px]">
-              ROAS {adsOverall.roas}x
+              ROAS {Number(adsOverall?.roas ?? 0)}x
             </span>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-[#FFE600] font-lobby tracking-wide">
@@ -144,7 +148,7 @@ export const AdsDashboard: React.FC<AdsDashboardProps> = ({
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-white font-lobby tracking-wide">
-            {adsOverall.totalConversions}
+            {(Number(adsOverall?.totalConversions ?? 0)).toLocaleString('pt-BR')}
           </div>
           <div className="flex items-center gap-1.5 mt-2 text-xs text-zinc-400">
             <span>CPA Médio:</span>
@@ -161,11 +165,11 @@ export const AdsDashboard: React.FC<AdsDashboardProps> = ({
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-white font-lobby tracking-wide">
-            {(adsOverall.totalReach / 1000).toFixed(1)}k
+            {(Number(adsOverall?.totalReach ?? 0) / 1000).toFixed(1)}k
           </div>
           <div className="flex items-center justify-between mt-2 text-xs text-zinc-400">
-            <span>{adsOverall.totalClicks} cliques</span>
-            <span className="text-[#FFE600] font-semibold">CPC R$ {adsOverall.avgCpc.toFixed(2)}</span>
+            <span>{(Number(adsOverall?.totalClicks ?? 0)).toLocaleString('pt-BR')} cliques</span>
+            <span className="text-[#FFE600] font-semibold">CPC R$ {Number(adsOverall?.avgCpc ?? 0).toFixed(2)}</span>
           </div>
         </div>
 
@@ -201,7 +205,7 @@ export const AdsDashboard: React.FC<AdsDashboardProps> = ({
                 <div className="w-full max-w-[64px] flex items-end justify-center gap-1.5 h-44 relative">
                   
                   <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-[#FFE600] rounded px-2 py-1 text-[10px] text-white whitespace-nowrap z-20 pointer-events-none">
-                    R$ {item.spent.toFixed(2)} • {item.conversions} ingressos
+                    R$ {Number(item?.spent ?? 0).toFixed(2)} • {item?.conversions ?? 0} ingressos
                   </div>
 
                   <div 
@@ -313,28 +317,28 @@ export const AdsDashboard: React.FC<AdsDashboardProps> = ({
                     <div>
                       <span className="text-[10px] uppercase font-semibold text-zinc-400 block">Gasto</span>
                       <span className="font-bold text-white text-sm">
-                        R$ {camp.spent.toFixed(2)}
+                        R$ {Number(camp?.spent ?? 0).toFixed(2)}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-[10px] uppercase font-semibold text-zinc-400 block">Conversões</span>
                       <span className="font-bold text-[#FFE600] text-sm">
-                        {camp.conversions} vendas
+                        {(Number(camp?.conversions ?? 0)).toLocaleString('pt-BR')} vendas
                       </span>
                     </div>
 
                     <div>
                       <span className="text-[10px] uppercase font-semibold text-zinc-400 block">CPA</span>
                       <span className="font-bold text-white text-sm">
-                        R$ {camp.cpa.toFixed(2)}
+                        R$ {Number(camp?.cpa ?? 0).toFixed(2)}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-[10px] uppercase font-semibold text-zinc-400 block">ROAS</span>
                       <span className="font-extrabold text-[#FFE600] text-sm">
-                        {camp.roas}x
+                        {Number(camp?.roas ?? 0)}x
                       </span>
                     </div>
                   </div>

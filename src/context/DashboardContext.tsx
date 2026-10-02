@@ -92,12 +92,115 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (remoteData) {
         isUpdatingFromCloud.current = true;
-        if (remoteData.clientProfile) setClientProfile(remoteData.clientProfile);
-        if (remoteData.tasks && remoteData.tasks.length > 0) setTasks(remoteData.tasks);
-        if (remoteData.campaigns && remoteData.campaigns.length > 0) setCampaigns(remoteData.campaigns);
-        if (remoteData.adsOverall) setAdsOverall(remoteData.adsOverall);
-        if (remoteData.instagramMetric) setInstagramMetric(remoteData.instagramMetric);
-        if (remoteData.instagramPosts && remoteData.instagramPosts.length > 0) setInstagramPosts(remoteData.instagramPosts);
+
+        // 1. Merge robusto de clientProfile com estado padrão
+        if (remoteData.clientProfile) {
+          setClientProfile(prev => ({
+            ...initialClientProfile,
+            ...prev,
+            ...remoteData.clientProfile,
+            brandColors: {
+              ...initialClientProfile.brandColors,
+              ...(prev?.brandColors || {}),
+              ...(remoteData.clientProfile?.brandColors || {})
+            },
+            bioLines: Array.isArray(remoteData.clientProfile?.bioLines) && remoteData.clientProfile.bioLines.length > 0
+              ? remoteData.clientProfile.bioLines
+              : (prev?.bioLines ?? initialClientProfile.bioLines),
+            highlights: Array.isArray(remoteData.clientProfile?.highlights) && remoteData.clientProfile.highlights.length > 0
+              ? remoteData.clientProfile.highlights
+              : (prev?.highlights ?? initialClientProfile.highlights),
+            keyNotes: Array.isArray(remoteData.clientProfile?.keyNotes) && remoteData.clientProfile.keyNotes.length > 0
+              ? remoteData.clientProfile.keyNotes
+              : (prev?.keyNotes ?? initialClientProfile.keyNotes)
+          }));
+        }
+
+        // 2. Merge robusto de adsOverall garantindo todos os números definidos
+        if (remoteData.adsOverall) {
+          setAdsOverall(prev => ({
+            ...initialAdsOverall,
+            ...prev,
+            ...remoteData.adsOverall,
+            totalSpent: Number(remoteData.adsOverall?.totalSpent ?? prev?.totalSpent ?? initialAdsOverall.totalSpent),
+            totalConversions: Number(remoteData.adsOverall?.totalConversions ?? prev?.totalConversions ?? initialAdsOverall.totalConversions),
+            totalClicks: Number(remoteData.adsOverall?.totalClicks ?? prev?.totalClicks ?? initialAdsOverall.totalClicks),
+            totalReach: Number(remoteData.adsOverall?.totalReach ?? prev?.totalReach ?? initialAdsOverall.totalReach),
+            totalImpressions: Number(remoteData.adsOverall?.totalImpressions ?? prev?.totalImpressions ?? initialAdsOverall.totalImpressions),
+            avgCpc: Number(remoteData.adsOverall?.avgCpc ?? prev?.avgCpc ?? initialAdsOverall.avgCpc),
+            avgCtr: Number(remoteData.adsOverall?.avgCtr ?? prev?.avgCtr ?? initialAdsOverall.avgCtr),
+            roas: Number(remoteData.adsOverall?.roas ?? prev?.roas ?? initialAdsOverall.roas),
+            symplaRevenueEstimated: Number(remoteData.adsOverall?.symplaRevenueEstimated ?? prev?.symplaRevenueEstimated ?? initialAdsOverall.symplaRevenueEstimated)
+          }));
+        }
+
+        // 3. Merge robusto de instagramMetric garantindo averageStoryViews e demais métricas definidas
+        if (remoteData.instagramMetric) {
+          setInstagramMetric(prev => ({
+            ...initialInstagramMetric,
+            ...prev,
+            ...remoteData.instagramMetric,
+            followers: Number(remoteData.instagramMetric?.followers ?? prev?.followers ?? initialInstagramMetric.followers),
+            followersGrowth: Number(remoteData.instagramMetric?.followersGrowth ?? prev?.followersGrowth ?? initialInstagramMetric.followersGrowth),
+            accountsReached: Number(remoteData.instagramMetric?.accountsReached ?? prev?.accountsReached ?? initialInstagramMetric.accountsReached),
+            reachGrowth: Number(remoteData.instagramMetric?.reachGrowth ?? prev?.reachGrowth ?? initialInstagramMetric.reachGrowth),
+            engagementRate: Number(remoteData.instagramMetric?.engagementRate ?? prev?.engagementRate ?? initialInstagramMetric.engagementRate),
+            totalPosts: Number(remoteData.instagramMetric?.totalPosts ?? prev?.totalPosts ?? initialInstagramMetric.totalPosts),
+            averageStoryViews: Number(remoteData.instagramMetric?.averageStoryViews ?? prev?.averageStoryViews ?? initialInstagramMetric.averageStoryViews),
+            profileVisits: Number(remoteData.instagramMetric?.profileVisits ?? prev?.profileVisits ?? initialInstagramMetric.profileVisits),
+            websiteClicks: Number(remoteData.instagramMetric?.websiteClicks ?? prev?.websiteClicks ?? initialInstagramMetric.websiteClicks)
+          }));
+        }
+
+        // 4. Merge robusto de tasks com propriedades seguras
+        if (Array.isArray(remoteData.tasks) && remoteData.tasks.length > 0) {
+          setTasks(remoteData.tasks.map(t => ({
+            id: t.id || `task-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            title: t.title || '',
+            description: t.description || '',
+            category: t.category || 'trafego_ads',
+            status: t.status || 'pendente',
+            priority: t.priority || 'media',
+            dueDate: t.dueDate || '',
+            assignee: t.assignee || 'Equipe',
+            completedAt: t.completedAt,
+            deliverableUrl: t.deliverableUrl,
+            imageUrl: t.imageUrl,
+            images: t.images,
+            notes: t.notes,
+            approvedByClient: Boolean(t.approvedByClient)
+          })));
+        }
+
+        // 5. Merge robusto de campaigns com valores numéricos seguros
+        if (Array.isArray(remoteData.campaigns) && remoteData.campaigns.length > 0) {
+          setCampaigns(remoteData.campaigns.map(c => ({
+            id: c.id || `camp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            name: c.name || '',
+            platform: c.platform || 'Meta Ads (Instagram)',
+            period: c.period || 'Mês Atual',
+            budget: Number(c.budget ?? 0),
+            spent: Number(c.spent ?? 0),
+            reach: Number(c.reach ?? 0),
+            impressions: Number(c.impressions ?? 0),
+            clicks: Number(c.clicks ?? 0),
+            conversions: Number(c.conversions ?? 0),
+            cpc: Number(c.cpc ?? 0),
+            cpm: Number(c.cpm ?? 0),
+            ctr: Number(c.ctr ?? 0),
+            cpa: Number(c.cpa ?? 0),
+            roas: Number(c.roas ?? 1),
+            status: c.status || 'ativa',
+            targetAudience: c.targetAudience || 'Brasília, DF',
+            creativeUrl: c.creativeUrl,
+            notes: c.notes
+          })));
+        }
+
+        // 6. Merge seguro de instagramPosts
+        if (Array.isArray(remoteData.instagramPosts) && remoteData.instagramPosts.length > 0) {
+          setInstagramPosts(remoteData.instagramPosts);
+        }
         
         setSyncStatus('synced');
         setTimeout(() => {
@@ -299,12 +402,39 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const importDataJSON = (jsonString: string): boolean => {
     try {
       const data = JSON.parse(jsonString);
-      if (data.clientProfile) setClientProfile(data.clientProfile);
-      if (data.tasks) setTasks(data.tasks);
-      if (data.campaigns) setCampaigns(data.campaigns);
-      if (data.adsOverall) setAdsOverall(data.adsOverall);
-      if (data.instagramMetric) setInstagramMetric(data.instagramMetric);
-      if (data.instagramPosts) setInstagramPosts(data.instagramPosts);
+      if (data.clientProfile) {
+        setClientProfile(prev => ({
+          ...initialClientProfile,
+          ...prev,
+          ...data.clientProfile,
+          brandColors: {
+            ...initialClientProfile.brandColors,
+            ...(prev?.brandColors || {}),
+            ...(data.clientProfile?.brandColors || {})
+          }
+        }));
+      }
+      if (Array.isArray(data.tasks)) setTasks(data.tasks);
+      if (Array.isArray(data.campaigns)) setCampaigns(data.campaigns);
+      if (data.adsOverall) {
+        setAdsOverall(prev => ({
+          ...initialAdsOverall,
+          ...prev,
+          ...data.adsOverall,
+          totalSpent: Number(data.adsOverall?.totalSpent ?? prev?.totalSpent ?? 0),
+          totalConversions: Number(data.adsOverall?.totalConversions ?? prev?.totalConversions ?? 0)
+        }));
+      }
+      if (data.instagramMetric) {
+        setInstagramMetric(prev => ({
+          ...initialInstagramMetric,
+          ...prev,
+          ...data.instagramMetric,
+          averageStoryViews: Number(data.instagramMetric?.averageStoryViews ?? prev?.averageStoryViews ?? initialInstagramMetric.averageStoryViews),
+          accountsReached: Number(data.instagramMetric?.accountsReached ?? prev?.accountsReached ?? initialInstagramMetric.accountsReached)
+        }));
+      }
+      if (Array.isArray(data.instagramPosts)) setInstagramPosts(data.instagramPosts);
       return true;
     } catch (e) {
       console.error('Erro ao importar JSON:', e);

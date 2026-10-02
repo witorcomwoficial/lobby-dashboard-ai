@@ -61,11 +61,11 @@ export const InstagramAnalytics: React.FC = () => {
               <Users className="w-4 h-4 text-[#FFE600]" />
             </div>
             <div className="text-2xl font-black text-white font-lobby tracking-wide">
-              {clientProfile.followersCount}
+              {clientProfile?.followersCount ?? (Number(instagramMetric?.followers ?? 0)).toLocaleString('pt-BR')}
             </div>
             <div className="flex items-center gap-1 mt-1 text-xs text-emerald-400 font-semibold">
               <ArrowUpRight className="w-3 h-3" />
-              <span>+{instagramMetric.followersGrowth} novos seguidores</span>
+              <span>+{(Number(instagramMetric?.followersGrowth ?? 0)).toLocaleString('pt-BR')} novos seguidores</span>
             </div>
           </div>
 
@@ -75,11 +75,11 @@ export const InstagramAnalytics: React.FC = () => {
               <Eye className="w-4 h-4 text-[#FFE600]" />
             </div>
             <div className="text-2xl font-black text-[#FFE600] font-lobby tracking-wide">
-              {(instagramMetric.accountsReached / 1000).toFixed(1)}k
+              {(Number(instagramMetric?.accountsReached ?? 0) / 1000).toFixed(1)}k
             </div>
             <div className="flex items-center gap-1 mt-1 text-xs text-emerald-400 font-semibold">
               <ArrowUpRight className="w-3 h-3" />
-              <span>+{instagramMetric.reachGrowth}% vs mês anterior</span>
+              <span>+{Number(instagramMetric?.reachGrowth ?? 0)}% vs mês anterior</span>
             </div>
           </div>
 
@@ -89,7 +89,7 @@ export const InstagramAnalytics: React.FC = () => {
               <TrendingUp className="w-4 h-4 text-[#FFE600]" />
             </div>
             <div className="text-2xl font-black text-white font-lobby tracking-wide">
-              {instagramMetric.engagementRate}%
+              {Number(instagramMetric?.engagementRate ?? 0)}%
             </div>
             <div className="mt-1 text-xs text-zinc-400">
               Média do nicho: 2.1% (Excelente)
@@ -102,7 +102,7 @@ export const InstagramAnalytics: React.FC = () => {
               <Clock className="w-4 h-4 text-amber-400" />
             </div>
             <div className="text-2xl font-black text-amber-400 font-lobby tracking-wide">
-              {instagramMetric.averageStoryViews.toLocaleString('pt-BR')}
+              {(Number(instagramMetric?.averageStoryViews ?? 0)).toLocaleString('pt-BR')}
             </div>
             <div className="mt-1 text-xs text-zinc-400">
               Pico às sextas & sábados
@@ -123,7 +123,7 @@ export const InstagramAnalytics: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {instagramPosts.map(post => (
+          {(instagramPosts ?? []).map(post => (
             <div 
               key={post.id}
               className="bg-zinc-900/80 border border-zinc-800 hover:border-[#FFE600]/40 rounded-xl overflow-hidden transition group flex flex-col"

@@ -35,8 +35,9 @@ export const Header: React.FC<HeaderProps> = ({
     syncStatus
   } = useDashboard();
 
-  const completedTasks = tasks.filter(t => t.status === 'feito').length;
-  const progressPercent = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const completedTasks = safeTasks.filter(t => t?.status === 'feito').length;
+  const progressPercent = safeTasks.length > 0 ? Math.round((completedTasks / safeTasks.length) * 100) : 0;
 
   const handlePrint = () => {
     window.print();

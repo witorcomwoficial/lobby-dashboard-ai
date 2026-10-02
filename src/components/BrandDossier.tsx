@@ -52,12 +52,12 @@ export const BrandDossier: React.FC = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>@{clientProfile.handle}</span>
+                <span>@{clientProfile?.handle ?? 'listenlobby'}</span>
                 <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#FFE600] text-black text-[10px] font-bold">
                   ✓
                 </span>
               </h2>
-              <span className="text-xs text-zinc-400">({clientProfile.followersCount} seguidores • {clientProfile.postsCount} posts)</span>
+              <span className="text-xs text-zinc-400">({clientProfile?.followersCount ?? '0'} seguidores • {clientProfile?.postsCount ?? 0} posts)</span>
             </div>
 
             <div className="space-y-1.5 text-xs text-zinc-300">
@@ -75,24 +75,24 @@ export const BrandDossier: React.FC = () => {
               </p>
               <p className="flex items-center gap-2 text-zinc-400">
                 <MapPin className="w-4 h-4 text-[#FFE600]" />
-                <span>{clientProfile.location}</span>
+                <span>{clientProfile?.location ?? 'Brasília - DF'}</span>
               </p>
             </div>
           </div>
 
           <div className="flex flex-col justify-center gap-2.5 sm:items-end">
             <a
-              href="https://instagram.com/listenlobby"
+              href={`https://instagram.com/${clientProfile?.handle ?? 'listenlobby'}`}
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-semibold transition"
             >
               <ExternalLink className="w-3.5 h-3.5 text-[#FFE600]" />
-              <span>Abrir Instagram Oficial (@listenlobby)</span>
+              <span>Abrir Instagram Oficial (@{clientProfile?.handle ?? 'listenlobby'})</span>
             </a>
 
             <a
-              href={clientProfile.ticketLink}
+              href={clientProfile?.ticketLink ?? 'https://sympla.com.br'}
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#FFE600] hover:bg-[#F0D500] text-black text-xs font-bold transition shadow"
@@ -102,13 +102,13 @@ export const BrandDossier: React.FC = () => {
             </a>
 
             <a
-              href="https://linktr.ee/listenlobby"
+              href={clientProfile?.linktree ?? 'https://linktr.ee'}
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-zinc-950 text-zinc-400 hover:text-white text-xs transition"
             >
               <Link2 className="w-3.5 h-3.5 text-[#FFE600]" />
-              <span>linktr.ee/listenlobby</span>
+              <span>{clientProfile?.linktree ? clientProfile.linktree.replace(/^https?:\/\//, '') : 'linktr.ee'}</span>
             </a>
           </div>
         </div>

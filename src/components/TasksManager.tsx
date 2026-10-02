@@ -105,26 +105,27 @@ export const TasksManager: React.FC<TasksManagerProps> = ({ onOpenAddTaskModal, 
   };
 
   // Counters
-  const completedTasks = tasks.filter(t => t.status === 'feito');
-  const inProgressTasks = tasks.filter(t => t.status === 'em_andamento');
-  const pendingTasks = tasks.filter(t => t.status === 'pendente');
-  const clientApprovedCount = tasks.filter(t => t.approvedByClient).length;
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const completedTasks = safeTasks.filter(t => t?.status === 'feito');
+  const inProgressTasks = safeTasks.filter(t => t?.status === 'em_andamento');
+  const pendingTasks = safeTasks.filter(t => t?.status === 'pendente');
+  const clientApprovedCount = safeTasks.filter(t => t?.approvedByClient).length;
 
-  const completionRate = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+  const completionRate = safeTasks.length > 0 ? Math.round((completedTasks.length / safeTasks.length) * 100) : 0;
 
   // Filtered tasks
-  const filteredTasks = tasks.filter(task => {
-    if (selectedStatus === 'feito' && task.status !== 'feito') return false;
-    if (selectedStatus === 'em_andamento' && task.status !== 'em_andamento') return false;
-    if (selectedStatus === 'pendente' && task.status !== 'pendente') return false;
+  const filteredTasks = safeTasks.filter(task => {
+    if (selectedStatus === 'feito' && task?.status !== 'feito') return false;
+    if (selectedStatus === 'em_andamento' && task?.status !== 'em_andamento') return false;
+    if (selectedStatus === 'pendente' && task?.status !== 'pendente') return false;
 
-    if (selectedCategory !== 'all' && task.category !== selectedCategory) return false;
+    if (selectedCategory !== 'all' && task?.category !== selectedCategory) return false;
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      const matchTitle = task.title.toLowerCase().includes(query);
-      const matchDesc = task.description.toLowerCase().includes(query);
-      const matchAssignee = task.assignee.toLowerCase().includes(query);
+      const matchTitle = (task?.title ?? '').toLowerCase().includes(query);
+      const matchDesc = (task?.description ?? '').toLowerCase().includes(query);
+      const matchAssignee = (task?.assignee ?? '').toLowerCase().includes(query);
       if (!matchTitle && !matchDesc && !matchAssignee) return false;
     }
 
