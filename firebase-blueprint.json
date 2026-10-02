@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "Task": {
+      "title": "Task",
+      "description": "Represents an agency delivery or task for the client project.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "enum": ["trafego_ads", "social_media", "design_criacao", "eventos_sympla", "estrategia"] },
+        "status": { "type": "string", "enum": ["feito", "em_andamento", "pendente", "em_revisao"] },
+        "priority": { "type": "string", "enum": ["baixa", "media", "alta", "urgente"] },
+        "dueDate": { "type": "string" },
+        "completedAt": { "type": "string" },
+        "assignee": { "type": "string", "maxLength": 100 },
+        "deliverableUrl": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 1000000 },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "approvedByClient": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "category", "status", "priority", "dueDate"]
+    },
+    "AdCampaign": {
+      "title": "AdCampaign",
+      "description": "Advertising campaign numbers for the client project.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 200 },
+        "platform": { "type": "string" },
+        "period": { "type": "string" },
+        "budget": { "type": "number" },
+        "spent": { "type": "number" },
+        "reach": { "type": "number" },
+        "impressions": { "type": "number" },
+        "clicks": { "type": "number" },
+        "conversions": { "type": "number" },
+        "cpc": { "type": "number" },
+        "cpm": { "type": "number" },
+        "ctr": { "type": "number" },
+        "cpa": { "type": "number" },
+        "roas": { "type": "number" },
+        "status": { "type": "string" },
+        "targetAudience": { "type": "string" },
+        "creativeUrl": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "name", "platform", "spent", "conversions"]
+    },
+    "ProjectSettings": {
+      "title": "ProjectSettings",
+      "description": "Overall project settings, metrics and profile data.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "data": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["type"]
+    }
+  },
+  "firestore": {
+    "/tasks/{taskId}": {
+      "schema": { "$ref": "Task" },
+      "description": "Collection of tasks and deliverables for the client dashboard."
+    },
+    "/campaigns/{campaignId}": {
+      "schema": { "$ref": "AdCampaign" },
+      "description": "Collection of advertising campaigns."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "ProjectSettings" },
+      "description": "Overall metrics, client profile, and Instagram analytics."
+    }
+  }
+}
